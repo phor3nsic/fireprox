@@ -239,7 +239,7 @@ class FireProx(object):
         if not url:
             self.error('Please provide a valid URL end-point')
 
-        print(f'Creating => {url}...')
+        #print(f'Creating => {url}...')
 
         template = self.get_template()
         response = self.client.import_rest_api(
@@ -249,6 +249,8 @@ class FireProx(object):
             body=template
         )
         resource_id, proxy_url = self.create_deployment(response['id'])
+        return proxy_url
+        """
         self.store_api(
             response['id'],
             response['name'],
@@ -258,6 +260,7 @@ class FireProx(object):
             resource_id,
             proxy_url
         )
+        """
 
     def update_api(self, api_id, url):
         if not any([api_id, url]):
