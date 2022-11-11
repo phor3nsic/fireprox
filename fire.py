@@ -249,7 +249,8 @@ class FireProx(object):
             body=template
         )
         resource_id, proxy_url = self.create_deployment(response['id'])
-        return proxy_url
+        result = {"id":response['id'],"proxy_url":proxy_url}
+        return result
         """
         self.store_api(
             response['id'],
@@ -291,7 +292,7 @@ class FireProx(object):
     def delete_api(self, api_id):
         if not api_id:
             self.error('Please provide a valid API ID')
-        items = self.list_api(api_id)
+        items = self.list_api(api_id, deleting=True)
         for item in items:
             item_api_id = item['id']
             if item_api_id == api_id:
@@ -301,8 +302,11 @@ class FireProx(object):
                 return True
         return False
 
-    def list_api(self, deleted_api_id=None):
+    def list_api(self, deleted_api_id=None, deleting=None):
         response = self.client.get_rest_apis()
+        if deleting == True:
+            return response['items']
+
         for item in response['items']:
             try:
                 created_dt = item['createdDate']
@@ -310,7 +314,7 @@ class FireProx(object):
                 name = item['name']
                 proxy_url = self.get_integration(api_id).replace('{proxy}', '')
                 url = f'https://{api_id}.execute-api.{self.region}.amazonaws.com/fireprox/'
-                if not api_id == deleted_api_id:
+                if deleting == False:
                     print(f'[{created_dt}] ({api_id}) {name}: {url} => {proxy_url}')
             except:
                 pass
@@ -383,6 +387,10 @@ def parse_arguments() -> Tuple[argparse.Namespace, str]:
                         help='API ID', type=str, required=False)
     parser.add_argument('--url',
                         help='URL end-point', type=str, required=False)
+    parser.add_argument('--output',
+                        help='output to save log urls', type=str, required=False)
+    parser.add_argument('--shell',
+                        help='Shell to execute', type=str, required=False)
     return parser.parse_args(), parser.format_help()
 
 
@@ -395,7 +403,7 @@ def main():
     fp = FireProx(args, help_text)
     if args.command == 'list':
         print(f'Listing API\'s...')
-        result = fp.list_api()
+        result = fp.list_api(deleting=False)
 
     elif args.command == 'create':
         result = fp.create_api(fp.url)

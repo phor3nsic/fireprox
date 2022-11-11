@@ -100,6 +100,17 @@ $ cd fireprox
 $ docker build -t fireprox .
 $ docker run --rm -it fireprox -h
 ```
+## Fork UPDATE
+
+> shell command:
+```sh
+./fire_auto.py --url https://hackerone.com/ --output nuclei.txt --command shell --shell "echo URL | nuclei -silent >> OUTPUT"
+```
+
+> multi targets:
+```sh
+for x in $(cat hosts); do ./fire_auto.py --url $x --output httpx-status.txt --command shell --shell "echo URL | nuclei -silent >> OUTPUT"; done
+```
 
 ## Screenshots
 ![Usage](https://github.com/ustayready/fireprox/blob/master/screenshots/usage.png "usage")
