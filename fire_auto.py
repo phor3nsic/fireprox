@@ -9,6 +9,7 @@ import json
 import fire
 from time import sleep
 from itertools import islice
+from urllib.parse import urlparse
 from concurrent.futures import ThreadPoolExecutor
 
 def get_random_string():
@@ -35,9 +36,12 @@ def delete_used_apis():
 def parser_output(api_id, url):
 	with open(f"/tmp/{index_file}fireproxy.outputtemp.txt") as f:
 		lines = f.readlines()
-		proxy_url = f"https://{api_id}.execute-api.{args.region}.amazonaws.com/fireprox/"
+		proxy_domain = f"{api_id}.execute-api.{args.region}.amazonaws.com"
+		proxy_url = f"https://{proxy_domain}/fireprox/"
+		parsed_url = urlparse(url)
 		for line in lines:
 			line = line.replace(proxy_url,url)
+			line = line.replace(proxy_domain,parsed_url.netloc)
 			print(line.replace('\n',''))
 			save(line, args.output)
 
